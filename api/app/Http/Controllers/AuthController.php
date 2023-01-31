@@ -46,20 +46,35 @@ class AuthController extends Controller
             'remember' => 'boolean'
         ]);
 
+
         $remember = $credentials['remember'] ?? false;
         unset($credentials['remember']);
 
+        // Take credentials and try to login the user
         if (!Auth::attempt($credentials, $remember)) {
             return response([
                 'error' => 'The Provided credentials are not correct'
             ], 422);
         }
+        /** @var \App\Models\User $user **/
         $user = Auth::user();
         $token = $user->createToken('main')->plainTextToken;
 
         return response([
             'user' => $user,
             'token' => $token
+        ]);
+    }
+
+    public function logout()
+    {
+        /** @var User @user */
+        $user = Auth::user();
+        // Revoke the token that was used to authenticate the current request...
+        $user->currentAccessToken()->delete();
+
+        return response([
+            'success' => true
         ]);
     }
 }
