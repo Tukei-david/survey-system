@@ -124,8 +124,58 @@
                         </div>
                     </div>
 
+                    <div class="px-4 py-5 bg-white space-y-6 sm:px-6">
+                        <h3
+                            class="text-2xl font-semibold flex items-center justify-between"
+                        >
+                            Questions
+
+                            <!--Add Question-->
+                            <button
+                                type="button"
+                                @click="addQuestion()"
+                                class="flex items-center text-sm py-1 px-4 rounded-sm text-white bg-gray-600 hover:bg-gray-700"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    class="w-4 h-4"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M12 4.5v15m7.5-7.5h-15"
+                                    />
+                                </svg>
+
+                                Add question
+                            </button>
+                        </h3>
+                        <div v-if="!model.questions.length" class="text-center text-gray-600">
+                            You don't have any questions created
+                        </div>
+                        <div v-for="(question, index) in model.questions" :key="question.id">
+                            <!-- WIll listen if the question has been changed on deleted -->
+                            <QuestionEditor
+                                :question="question"
+                                :index="index"
+                                @change="questionChange"
+                                @addQuestion="addQuestion"
+                                @deleteQuestion="deleteQuestion"
+                            />
+                        </div>
+                    </div>
+
                     <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save</button>
+                        <button
+                            type="submit"
+                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Save
+                        </button>
                     </div>
                 </div>
             </div>
@@ -134,10 +184,12 @@
 </template>
 
 <script setup>
+import { v4 as uuid4v4 } from "uuid"
 import store from "../store";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 import PageComponent from "../components/PageComponent.vue";
+import QuestionEditor from "../components/editor/QuestionEditor.vue";
 
 const route = useRoute();
 
@@ -154,6 +206,34 @@ if (route.params.id) {
     model.value = store.state.surveys.find(
         (s) => s.id === parseInt(route.params.id)
     );
+}
+
+function addQuestion(index) {
+    // New empty question with default values
+    const newQuestion = {
+        id: uuid4v4(),
+        type: "text",
+        question: "",
+        description: null,
+        data: {}
+    }
+
+    model.value.questions.splice(index, 0, newQuestion)
+}
+
+function deleteQuestion(question) {
+    model.value.questions = model.value.questions.filter((q) => q !== question)
+}
+
+function questionChange(question) {
+    // Map take questions and remapp it again
+    model.value.questions = model.value.questions.map((q) => {
+        // Check if the q.id is equal to question.id 
+        if (q.id === question.id) {
+            return JSON.parse(JSON.stringify(question))
+        }
+        return q
+    })
 }
 </script>
 
