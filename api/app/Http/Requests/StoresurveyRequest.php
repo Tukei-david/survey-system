@@ -32,7 +32,7 @@ class StoresurveyRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:1000',
-            'user_id' => 'exists:users_id',
+            'user_id' => 'exists:users,id',
             'status' => 'required|boolean',
             'description' => 'nullable|string',
             'expire_date' => 'nullable|data|after:tomorrow'
