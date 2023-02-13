@@ -31,9 +31,19 @@ class SurveyController extends Controller
     public function store(StoresurveyRequest $request)
     {
         //
-        $result = survey::create($request->validated());
+        $data = $request->validated();
 
-        return new SurveyResource($result);
+        // Check if image was given and save on local file system
+
+        if (isset($data['image'])) {
+            // Save the link to relative path
+            $relativepath = $this->saveImage($data['image']);
+            $data['image'] = $relativepath;
+        }
+
+        $survey = survey::create($data);
+
+        return new SurveyResource($survey);
     }
 
     /**
@@ -84,5 +94,18 @@ class SurveyController extends Controller
 
         $survey->delete();
         return response('', 204);        
+    }
+
+    private function saveImage($image)
+    {
+        if (preg_match('/^data:image\/(\w+);base64,/', $image, $type)) {
+            // Take out the base64 encoded text without mime type
+            $image = substr($image, strpos($image, ','));
+            // Get file extension
+            $type = strtolower($type[1]);
+
+        }else {
+            throw new \Exception('did not match data URI with image data');
+        }
     }
 }

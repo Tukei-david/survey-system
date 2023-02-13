@@ -152,9 +152,11 @@ const store = createStore({
     getters: {},
     actions: {
         saveSurvey({ commit }, survey) {
+            delete survey.image_url
             let response
             if (survey.id) {
                 response = axiosClient.put(`/survey/${survey.id}`, survey).then((res) => {
+                    console.log(res);
                     commit("updateSurvey", res.data)
                     return res
                 })
@@ -164,6 +166,8 @@ const store = createStore({
                     return res
                 })
             }
+
+            return response
         },
         register ({ commit }, user) {
             return axiosClient.post('/register', user)

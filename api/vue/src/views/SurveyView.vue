@@ -17,9 +17,9 @@
                         </label>
                         <div class="mt-1 flex items-center">
                             <img
-                                v-if="model.image"
-                                :src="model.image"
-                                :alt="model.image"
+                                v-if="model.image_url"
+                                :src="model.image_url"
+                                :alt="model.title"
                                 class="w-64 h-48 object-cover"
                             />
                             <span
@@ -47,6 +47,7 @@
                             >
                                 <input
                                     type="file"
+                                    @change="onImageChoose"
                                     class="absolute left-0 top-0 right-0 bottom-0 opacity-0 cursor-pointer"
                                 />
                                 Change
@@ -209,6 +210,21 @@ if (route.params.id) {
     );
 }
 
+function onImageChoose (ev) {
+    const file = ev.target.files[0]
+
+    const reader = new FileReader()
+    reader.onload = () => {
+        // url for backend
+        model.value.image = reader.result
+
+        // url for frontend
+        model.value.image_url = reader.result
+    }
+
+    reader.readAsDataURL(file)
+}
+
 function addQuestion(index) {
     // New empty question with default values
     const newQuestion = {
@@ -239,6 +255,7 @@ function questionChange(question) {
 
 function saveSurvey() {
     store.dispatch("saveSurvey", model.value).then(({ data }) => {
+        
         router.push({
             name: "SurveyView",
             params: { id: data.data.id }
