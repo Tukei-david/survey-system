@@ -4,11 +4,41 @@
             <div class="flex items-center justify-between">
                 <h1 class="font-bold text-3xl text-gray-900">
                     <!-- If model has id --- dispaly the survey title else show create survey -->
-                    {{ model.id ? model.title : "Create a survey" }}
+                    <!-- {{ model.id ? model.title : "Create a survey" }} -->
+                    {{ route.params.id ? model.title : "Create a survey" }}
+                    <!-- Show it is an update-->
                 </h1>
+
+                <button
+                    v-if="route.params.id"
+                    type="button"
+                    @click="deleteSurvey()"
+                    class="py-2 px-3 text-white bg-red-500 rounded-md hover:bg-red-600"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-5 h-5 -mt-1 inline-block"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                        />
+                    </svg>
+
+                    Delete Survey
+                </button>
             </div>
         </template>
-        <form @submit.prevent="saveSurvey">
+
+        <!-- Loading template -->
+        <div v-if="surveyLoading" class="flex justify-center">Loading...</div>
+
+        <form v-else @submit.prevent="saveSurvey">
             <div class="shadow sm:rounded-md sm:overflow-hidden">
                 <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
                     <div>
@@ -155,10 +185,16 @@
                                 Add question
                             </button>
                         </h3>
-                        <div v-if="!model.questions.length" class="text-center text-gray-600">
+                        <div
+                            v-if="!model.questions.length"
+                            class="text-center text-gray-600"
+                        >
                             You don't have any questions created
                         </div>
-                        <div v-for="(question, index) in model.questions" :key="question.id">
+                        <div
+                            v-for="(question, index) in model.questions"
+                            :key="question.id"
+                        >
                             <!-- WIll listen if the question has been changed on deleted -->
                             <QuestionEditor
                                 :question="question"
@@ -185,44 +221,58 @@
 </template>
 
 <script setup>
-import { v4 as uuid4v4 } from "uuid"
+import { v4 as uuid4v4 } from "uuid";
 import store from "../store";
-import { ref } from "vue";
+import { ref, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import PageComponent from "../components/PageComponent.vue";
 import QuestionEditor from "../components/editor/QuestionEditor.vue";
 
 const route = useRoute();
-const router = useRouter()
+const router = useRouter();
+
+const surveyLoading = computed(() => store.state.currentSurvey.loading);
 
 let model = ref({
     title: "",
     status: false,
     description: null,
-    image: null,
+    image_url: null,
     expire_date: null,
     questions: [],
 });
 
+// watch the current survey data change and when this happens we update the local model varibale
+watch(
+    () => store.state.currentSurvey.data,
+    (newVal, oldVal) => {
+        model.value = {
+            ...JSON.parse(JSON.stringify(newVal)),
+            status: newVal.status !== "draft",
+        };
+    }
+);
+
 if (route.params.id) {
-    model.value = store.state.surveys.find(
-        (s) => s.id === parseInt(route.params.id)
-    );
+    // model.value = store.state.surveys.find(
+    //     (s) => s.id === parseInt(route.params.id)
+    // );
+    store.dispatch("getSurvey", route.params.id);
 }
 
-function onImageChoose (ev) {
-    const file = ev.target.files[0]
+function onImageChoose(ev) {
+    const file = ev.target.files[0];
 
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = () => {
         // url for backend
-        model.value.image = reader.result
+        model.value.image = reader.result;
 
         // url for frontend
-        model.value.image_url = reader.result
-    }
+        model.value.image_url = reader.result;
+    };
 
-    reader.readAsDataURL(file)
+    reader.readAsDataURL(file);
 }
 
 function addQuestion(index) {
@@ -232,36 +282,46 @@ function addQuestion(index) {
         type: "text",
         question: "",
         description: null,
-        data: {}
-    }
+        data: {},
+    };
 
-    model.value.questions.splice(index, 0, newQuestion)
+    model.value.questions.splice(index, 0, newQuestion);
 }
 
 function deleteQuestion(question) {
-    model.value.questions = model.value.questions.filter((q) => q !== question)
+    model.value.questions = model.value.questions.filter((q) => q !== question);
 }
 
 function questionChange(question) {
     // Map take questions and remapp it again
     model.value.questions = model.value.questions.map((q) => {
-        // Check if the q.id is equal to question.id 
+        // Check if the q.id is equal to question.id
         if (q.id === question.id) {
-            return JSON.parse(JSON.stringify(question))
+            return JSON.parse(JSON.stringify(question));
         }
-        return q
-    })
+        return q;
+    });
 }
 
 function saveSurvey() {
     store.dispatch("saveSurvey", model.value).then(({ data }) => {
-        
         router.push({
             name: "SurveyView",
-            params: { id: data.data.id }
-        })
-    })
+            params: { id: data.data.id },
+        });
+    });
 }
+
+function deleteSurvey() {
+    if ( confirm(`Are you sure you want to delete this survey? Operation can't be undone` )) {
+        store.dispatch("deleteSurvey", model.value.id).then( () => {
+            router.push({
+                name: "Surveys",
+            })
+        })
+    }
+}
+
 </script>
 
 <style></style>

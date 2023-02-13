@@ -113,6 +113,13 @@ class SurveyController extends Controller
         }
 
         $survey->delete();
+
+        // If there is an old imiage, delete it
+        if ($survey->image) {
+            $absolutePath = public_path($survey->image);
+            File::delete($absolutePath);
+        }
+
         return response('', 204);        
     }
 
