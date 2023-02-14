@@ -205,8 +205,6 @@ const emit = defineEmits(["change", "addQuestion", "deleteQuestion"]);
 // Re-create the whole question data to avoid unintentional reference change
 const model = ref(JSON.parse(JSON.stringify(props.question)));
 
-console.log(model)
-
 // Get questions types from vuex
 const questionTypes = computed(() => store.state.QuestionTypes)
 
