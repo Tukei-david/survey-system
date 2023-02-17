@@ -221,4 +221,27 @@ class SurveyController extends Controller
 
         return SurveyQuestion::create($validator->validated());
     }
+
+    private function updateQuestion( SurveyQuestion $question, $data)
+    {
+        if (is_array($data['data'])) {
+            $data['data'] = json_encode($data['data']);
+        }
+
+        $validator = Validator::make($data, [
+            'id' => 'exists:App\Models\SurveyQuestion,id',
+            'question' => 'required|string',
+            'type' => ['required', Rule::in([
+                survey::TYPE_TEXT,
+                survey::TYPE_TEXTAREA,
+                survey::TYPE_SELECT,
+                survey::TYPE_RADIO,
+                survey::TYPE_CHECKBOX,
+            ])],
+            'description' => 'nullable|string',
+            'data' => 'present',
+            ]);
+        
+        return $question->update($validator->validated());
+    }
 }
