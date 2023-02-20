@@ -1,12 +1,18 @@
 import { createRouter, createWebHistory } from "vue-router";
+
+
 import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Register from '../views/Register.vue'
 import DefaultLayout from '../components/DefaultLayout.vue'
 import Surveys from '../views/Surveys.vue'
 import SurveyView from '../views/SurveyView.vue'
+import SurveyPublicView from '../views/SurveyPublicView.vue'
+
+
 import store from "../store";
 import AuthLayout from '../components/AuthLayout.vue'
+
 
 
 const routes = [
@@ -33,6 +39,11 @@ const routes = [
             { path: '/login', name: 'Login', component: Login },
             { path: '/register', name: 'Register', component: Register },
         ]
+    },
+    {
+        path: '/view/survey/:slug',
+        name: 'SurveyPublicView',
+        component: SurveyPublicView
     }
 ]
 
