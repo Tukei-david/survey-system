@@ -25,7 +25,7 @@ class SurveyController extends Controller
     {
         //
         $user = $request->user(); // Get current user
-        return SurveyResource::collection(survey::where('user_id', $user->id)->paginate(50));
+        return SurveyResource::collection(survey::where('user_id', $user->id)->paginate(5));
     }
 
     /**

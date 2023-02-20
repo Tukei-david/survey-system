@@ -149,6 +149,7 @@
                 v-if="!model.data.options.length"
                 class="text-xs text-gray-600 text-center py-3"
             >
+                
                 You don't have any options defined
             </div>
             <div
@@ -156,6 +157,7 @@
                 :key="option.uuid"
                 class="flex items-center mb-1"
             >
+            
                 <span class="w-6 text-sm"> {{ index + 1 }}. </span>
                 <input
                     type="text"
