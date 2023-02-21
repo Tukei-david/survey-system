@@ -14,7 +14,6 @@ import store from "../store";
 import AuthLayout from '../components/AuthLayout.vue'
 
 
-
 const routes = [
     {
         path: '/',
