@@ -1,0 +1,21 @@
+Fix the repeated elements in vue (REUSABLE COMPONENTS)
+
+Expire date brings 500 Internal server error when creating and updating survey
+
+Deleting question answer doesn't work on database but works on front end
+
+When adding option make the option active insted of clicking again on the input field
+
+Fix the create profile for user
+
+Account settings like changing password and email address
+
+Email address verification
+
+Show name and image on profile image icon
+
+create logo for the survey
+
+Length problem when viewing the survey
+
+******** Create a public page like Dashboard ******
