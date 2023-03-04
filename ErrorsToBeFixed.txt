@@ -16,6 +16,6 @@ Show name and image on profile image icon
 
 create logo for the survey
 
-Length problem when viewing the survey
+Length problem when viewing the survey --- TRIED TO FIX WITH PRETTY MANUAL WAY
 
 ******** Create a public page like Dashboard ******

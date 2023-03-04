@@ -73,6 +73,14 @@
                                     >
                                         <MenuItem v-slot="{ active }">
                                             <a
+                                                :class="[
+                                                    'block px-4 py-2 text-sm text-gray-700 cursor-pointer',
+                                                ]"
+                                                >Profile</a
+                                            >
+                                        </MenuItem>
+                                        <MenuItem v-slot="{ active }">
+                                            <a
                                                 @click="logout"
                                                 :class="[
                                                     'block px-4 py-2 text-sm text-gray-700 cursor-pointer',

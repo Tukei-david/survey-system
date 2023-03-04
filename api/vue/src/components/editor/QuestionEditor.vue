@@ -146,10 +146,9 @@
 
             <!-- Checking if the options are present -->
             <div
-                v-if="!model.data.options.length"
+                v-if="!model.data.options"
                 class="text-xs text-gray-600 text-center py-3"
             >
-                
                 You don't have any options defined
             </div>
             <div
@@ -206,6 +205,8 @@ const emit = defineEmits(["change", "addQuestion", "deleteQuestion"]);
 
 // Re-create the whole question data to avoid unintentional reference change
 const model = ref(JSON.parse(JSON.stringify(props.question)));
+
+console.log('model', model);
 
 // Get questions types from vuex
 const questionTypes = computed(() => store.state.QuestionTypes)
