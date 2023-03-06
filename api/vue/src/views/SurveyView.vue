@@ -304,10 +304,17 @@ function questionChange(question) {
 }
 
 function saveSurvey() {
-    store.dispatch("saveSurvey", model.value).then(({ data }) => {
+    let action = "created";
+
+    if (model.value.id) {
+        action = "updated"
+    }
+
+    console.log(model);
+    store.dispatch("saveSurvey", { ...model.value }).then(({ data }) => {
         store.commit('notify', {
             type: 'success',
-            message: 'Survey was successfully updated'
+            message: 'Survey was successfully ' + action
         })
         router.push({
             name: "SurveyView",
